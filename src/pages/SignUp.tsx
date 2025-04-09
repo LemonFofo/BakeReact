@@ -8,10 +8,18 @@ import {
   Typography,
   Snackbar,
   Alert,
+  Checkbox,
+  FormControlLabel,
+  Divider,
+  useTheme,
 } from '@mui/material';
 import { supabase } from '../lib/supabaseClient';
+import GoogleIcon from '@mui/icons-material/Google';
+import AppleIcon from '@mui/icons-material/Apple';
+import images from '../utils/images';
 
 export const SignUp = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -19,6 +27,7 @@ export const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,75 +94,204 @@ export const SignUp = () => {
       sx={{
         height: '100vh',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         bgcolor: 'background.default',
       }}
     >
+      {/* Left side - Form */}
       <Box
-        component="form"
-        onSubmit={handleSignUp}
         sx={{
-          maxWidth: 400,
-          width: '100%',
-          p: 4,
-          borderRadius: 2,
-          bgcolor: 'background.paper',
-          boxShadow: 1,
+          flex: 1,
+          p: 6,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          maxWidth: '600px',
         }}
       >
-        <Stack spacing={3}>
-          <Typography variant="h4" align="center" gutterBottom>
-            Sign Up
-          </Typography>
+        <Box sx={{ mb: 6, display: 'flex', justifyContent: 'center' }}>
+          <img src={images.logo} alt="Logo" style={{ height: '60px', width: 'auto' }} />
+        </Box>
 
-          <TextField
-            required
-            fullWidth
-            label="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            error={!!error}
-          />
+        <Typography 
+          variant="h3" 
+          sx={{ 
+            mb: 4, 
+            fontWeight: 600,
+            color: theme.palette.primary.main
+          }}
+        >
+          Get Started Now
+        </Typography>
 
-          <TextField
-            required
-            fullWidth
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={!!error}
-          />
+        <Box component="form" onSubmit={handleSignUp}>
+          <Stack spacing={3}>
+            <TextField
+              fullWidth
+              label="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                },
+              }}
+            />
 
-          <TextField
-            required
-            fullWidth
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={!!error}
-            helperText={error}
-          />
+            <TextField
+              fullWidth
+              label="Email address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.primary.main,
+                  },
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: theme.palette.primary.main,
+                },
+              }}
+            />
 
-          <Button
-            type="submit"
-            variant="contained"
-            size="large"
-            disabled={loading}
-          >
-            {loading ? 'Signing up...' : 'Sign Up'}
-          </Button>
+            <TextField
+              fullWidth
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.primary.main,
+                  },
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: theme.palette.primary.main,
+                },
+              }}
+            />
 
-          <Button
-            variant="text"
-            onClick={() => navigate('/signin')}
-          >
-            Already have an account? Sign In
-          </Button>
-        </Stack>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={agreeToTerms}
+                  onChange={(e) => setAgreeToTerms(e.target.checked)}
+                  sx={{
+                    color: theme.palette.primary.main,
+                    '&.Mui-checked': {
+                      color: theme.palette.primary.main,
+                    },
+                  }}
+                />
+              }
+              label={
+                <Typography variant="body2" color="text.secondary">
+                  I agree to the Terms of Service and Privacy Policy
+                </Typography>
+              }
+            />
+
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={loading || !agreeToTerms}
+              sx={{
+                borderRadius: 2,
+                py: 1.5,
+                bgcolor: theme.palette.primary.main,
+                '&:hover': {
+                  bgcolor: theme.palette.primary.dark,
+                },
+                '&.Mui-disabled': {
+                  bgcolor: theme.palette.action.disabledBackground,
+                },
+              }}
+            >
+              {loading ? 'Creating account...' : 'Create Account'}
+            </Button>
+
+            <Box sx={{ textAlign: 'center', my: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Or continue with
+              </Typography>
+            </Box>
+
+            <Stack direction="row" spacing={2}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<GoogleIcon />}
+                sx={{
+                  borderRadius: 2,
+                  py: 1.5,
+                  borderColor: 'divider',
+                  color: 'text.primary',
+                  '&:hover': {
+                    borderColor: theme.palette.primary.main,
+                    bgcolor: 'transparent',
+                  },
+                }}
+              >
+                Sign up with Google
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<AppleIcon />}
+                sx={{
+                  borderRadius: 2,
+                  py: 1.5,
+                  borderColor: 'divider',
+                  color: 'text.primary',
+                  '&:hover': {
+                    borderColor: theme.palette.primary.main,
+                    bgcolor: 'transparent',
+                  },
+                }}
+              >
+                Sign up with Apple
+              </Button>
+            </Stack>
+
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Already have an account?{' '}
+                <Typography
+                  component="span"
+                  onClick={() => navigate('/signin')}
+                  sx={{
+                    color: theme.palette.primary.main,
+                    cursor: 'pointer',
+                    fontWeight: 500,
+                    '&:hover': { 
+                      textDecoration: 'underline',
+                      color: theme.palette.primary.dark,
+                    },
+                  }}
+                >
+                  Sign In
+                </Typography>
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
       </Box>
+
+      {/* Right side - Image */}
+      <Box
+        sx={{
+          flex: 1,
+          display: { xs: 'none', md: 'block' },
+          backgroundImage: `url(${images.chef})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
 
       <Snackbar
         open={success}
@@ -161,7 +299,17 @@ export const SignUp = () => {
         onClose={() => setSuccess(false)}
       >
         <Alert severity="success" sx={{ width: '100%' }}>
-          Successfully signed up! Redirecting to sign in...
+          Account created successfully! Redirecting...
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+      >
+        <Alert severity="error" sx={{ width: '100%' }}>
+          {error}
         </Alert>
       </Snackbar>
     </Box>

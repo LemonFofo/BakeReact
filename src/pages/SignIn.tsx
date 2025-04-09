@@ -8,10 +8,16 @@ import {
   Typography,
   Snackbar,
   Alert,
+  Divider,
+  useTheme,
 } from '@mui/material';
 import { supabase } from '../lib/supabaseClient';
+import GoogleIcon from '@mui/icons-material/Google';
+import AppleIcon from '@mui/icons-material/Apple';
+import images from '../utils/images';
 
 export const SignIn = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -78,66 +84,179 @@ export const SignIn = () => {
       sx={{
         height: '100vh',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         bgcolor: 'background.default',
       }}
     >
+      {/* Left side - Form */}
       <Box
-        component="form"
-        onSubmit={handleSignIn}
         sx={{
-          maxWidth: 400,
-          width: '100%',
-          p: 4,
-          borderRadius: 2,
-          bgcolor: 'background.paper',
-          boxShadow: 1,
+          flex: 1,
+          p: 6,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          maxWidth: '600px',
         }}
       >
-        <Stack spacing={3}>
-          <Typography variant="h4" align="center" gutterBottom>
-            Sign In
-          </Typography>
+        <Box sx={{ mb: 6, display: 'flex', justifyContent: 'center' }}>
+          <img src={images.logo} alt="Logo" style={{ height: '60px', width: 'auto' }} />
+        </Box>
+        
+        <Typography 
+          variant="h3" 
+          sx={{ 
+            mb: 4, 
+            fontWeight: 600,
+            color: theme.palette.primary.main
+          }}
+        >
+          Welcome Back
+        </Typography>
 
-          <TextField
-            required
-            fullWidth
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={!!error}
-          />
+        <Box component="form" onSubmit={handleSignIn}>
+          <Stack spacing={3}>
+            <TextField
+              fullWidth
+              label="Email address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.primary.main,
+                  },
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: theme.palette.primary.main,
+                },
+              }}
+            />
 
-          <TextField
-            required
-            fullWidth
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={!!error}
-            helperText={error}
-          />
+            <TextField
+              fullWidth
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.primary.main,
+                  },
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: theme.palette.primary.main,
+                },
+              }}
+            />
 
-          <Button
-            type="submit"
-            variant="contained"
-            size="large"
-            disabled={loading}
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={loading}
+              sx={{
+                borderRadius: 2,
+                py: 1.5,
+                bgcolor: theme.palette.primary.main,
+                '&:hover': {
+                  bgcolor: theme.palette.primary.dark,
+                },
+              }}
+            >
+              {loading ? 'Signing in...' : 'Sign In'}
+            </Button>
 
-          <Button
-            variant="text"
-            onClick={() => navigate('/signup')}
-          >
-            Don't have an account? Sign Up
-          </Button>
-        </Stack>
+            <Box sx={{ textAlign: 'center', my: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Or continue with
+              </Typography>
+            </Box>
+
+            <Stack direction="row" spacing={2}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<GoogleIcon />}
+                sx={{
+                  borderRadius: 2,
+                  py: 1.5,
+                  borderColor: 'divider',
+                  color: 'text.primary',
+                  '&:hover': {
+                    borderColor: theme.palette.primary.main,
+                    bgcolor: 'transparent',
+                  },
+                }}
+              >
+                Sign in with Google
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<AppleIcon />}
+                sx={{
+                  borderRadius: 2,
+                  py: 1.5,
+                  borderColor: 'divider',
+                  color: 'text.primary',
+                  '&:hover': {
+                    borderColor: theme.palette.primary.main,
+                    bgcolor: 'transparent',
+                  },
+                }}
+              >
+                Sign in with Apple
+              </Button>
+            </Stack>
+
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                Don't have an account?{' '}
+                <Typography
+                  component="span"
+                  onClick={() => navigate('/signup')}
+                  sx={{
+                    color: theme.palette.primary.main,
+                    cursor: 'pointer',
+                    fontWeight: 500,
+                    '&:hover': { 
+                      textDecoration: 'underline',
+                      color: theme.palette.primary.dark,
+                    },
+                  }}
+                >
+                  Sign Up
+                </Typography>
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
       </Box>
+
+      {/* Right side - Image */}
+      <Box
+        sx={{
+          flex: 1,
+          display: { xs: 'none', md: 'block' },
+          backgroundImage: `url(${images.chef})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+
+      <Snackbar
+        open={success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess(false)}
+      >
+        <Alert severity="success" sx={{ width: '100%' }}>
+          Successfully signed in! Redirecting...
+        </Alert>
+      </Snackbar>
 
       <Snackbar
         open={!!error}
@@ -146,16 +265,6 @@ export const SignIn = () => {
       >
         <Alert severity="error" sx={{ width: '100%' }}>
           {error}
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={success}
-        autoHideDuration={6000}
-        onClose={() => setSuccess(false)}
-      >
-        <Alert severity="success" sx={{ width: '100%' }}>
-          {signUpMessage || 'Successfully signed in! Redirecting...'}
         </Alert>
       </Snackbar>
     </Box>
