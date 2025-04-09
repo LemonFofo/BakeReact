@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 // import './index.css'; // Using inline styles
-import OrderToOven from './pages/OrderToOven'; // Import the main app component from its new location
+import App from './App'; // Import the main App component
 import reportWebVitals from './reportWebVitals';
 
 // Import MUI X Date Picker Localization
@@ -17,7 +17,7 @@ root.render(
   <React.StrictMode>
     {/* Wrap App with LocalizationProvider */}
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <OrderToOven /> {/* Render the actual app component */}
+      <App /> {/* Render the App component which contains the Router */}
     </LocalizationProvider>
     {/* <p>Hello World!</p> */}
   </React.StrictMode>
