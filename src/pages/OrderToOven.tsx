@@ -3,6 +3,7 @@ import OrderCard from '../components/OrderCard';
 import BakingPlan from '../components/BakingPlan';
 import AddOrderModal from '../components/AddOrderModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
+import DateStrip from '../components/DateStrip';
 import { Order, BakingStep } from '../types';
 import { colors, spacing, typography as customTypography, shadows } from '../theme';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -282,6 +283,13 @@ export default function OrderToOven() {
     setOrderToDelete(null);
   };
 
+  const handleDateChange = (newDate: Date) => {
+      console.log('New date selected:', newDate);
+      setSelectedDate(newDate);
+      // TODO: Add logic here to filter/fetch orders and baking steps for the newDate
+      // For now, just updating the state
+  };
+
   console.log('--- Preparing to render JSX ---');
   try {
     return (
@@ -300,21 +308,8 @@ export default function OrderToOven() {
             </Button>
           </Box>
 
-          {/* Date Picker Placeholder */}
-          <Box sx={{ 
-              backgroundColor: 'background.paper', 
-              p: spacing.md, 
-              borderRadius: 3, 
-              textAlign: 'center', 
-              mb: spacing.xl, 
-              boxShadow: 1, 
-              color: 'text.primary',
-              fontWeight: '500'
-          }}>
-            {selectedDate.toLocaleDateString('en-US', {
-              weekday: 'long', month: 'long', day: 'numeric',
-            })}
-          </Box>
+          {/* Replace Date Picker Placeholder with DateStrip */}
+          <DateStrip selectedDate={selectedDate} onChangeDate={handleDateChange} />
 
           {/* Orders Section */}
           <Box sx={{ margin: spacing.xl }}>
