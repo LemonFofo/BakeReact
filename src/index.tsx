@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 // import './index.css'; // Using inline styles
 import App from './App'; // Import the main App component
 import reportWebVitals from './reportWebVitals';
+import './i18n';
 
 // Import MUI X Date Picker Localization
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';

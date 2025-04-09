@@ -1,0 +1,11 @@
+{
+  "dashboard": {
+    "welcome": "Bon retour 👋 {{name}}",
+    "ordersToday": "Commandes aujourd'hui",
+    "itemsToBake": "Articles à cuire",
+    "dueToday": "Dû aujourd'hui",
+    "nextUp": "Prochaine étape",
+    "ordersThisWeek": "Commandes cette semaine",
+    "at": "à"
+  }
+} 

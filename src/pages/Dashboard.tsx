@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -10,6 +11,9 @@ import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import BakeryDiningOutlinedIcon from '@mui/icons-material/BakeryDiningOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import AccessTimeIcon from '@mui/icons-material/AccessTime'; // For Next Up
+
+// Components
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 // Recharts
 import {
@@ -24,9 +28,9 @@ import {
 
 // Mock Data
 const statsData = [
-  { title: 'Orders Today', count: 4, icon: <Inventory2OutlinedIcon sx={{ color: '#1976d2' }} />, bgColor: '#e3f2fd' },
-  { title: 'Items to Bake', count: 12, icon: <BakeryDiningOutlinedIcon sx={{ color: '#ed6c02' }} />, bgColor: '#fff3e0' },
-  { title: 'Due Today', count: 2, icon: <CalendarTodayOutlinedIcon sx={{ color: '#2e7d32' }}/>, bgColor: '#e8f5e9' },
+  { title: 'dashboard.ordersToday', count: 4, icon: <Inventory2OutlinedIcon sx={{ color: '#1976d2' }} />, bgColor: '#e3f2fd' },
+  { title: 'dashboard.itemsToBake', count: 12, icon: <BakeryDiningOutlinedIcon sx={{ color: '#ed6c02' }} />, bgColor: '#fff3e0' },
+  { title: 'dashboard.dueToday', count: 2, icon: <CalendarTodayOutlinedIcon sx={{ color: '#2e7d32' }}/>, bgColor: '#e8f5e9' },
 ];
 
 const chartData = [
@@ -45,16 +49,21 @@ const nextBakingStep = {
 }
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, fontFamily: 'Inter, sans-serif' }}> {/* Add padding and font */}
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 500 }}>
-          Welcome back 👋 Fer
-        </Typography>
-        <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-          Here's what's happening today at a glance
-        </Typography>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 500 }}>
+            {(t as any)('dashboard.welcome', { name: 'Fer' })}
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+            Here's what's happening today at a glance
+          </Typography>
+        </Box>
+        <LanguageSwitcher />
       </Box>
 
       {/* Stat Cards */}
@@ -90,7 +99,7 @@ const Dashboard: React.FC = () => {
             </Avatar>
             <Box>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {stat.title}
+                {(t as any)(stat.title)}
               </Typography>
               <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
                 {stat.count}
@@ -112,7 +121,7 @@ const Dashboard: React.FC = () => {
         {/* Next Up Section */}
         <Paper elevation={1} sx={{ p: 3, borderRadius: 3, height: '100%' }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 'medium' }}>
-            Next Up
+            {(t as any)('dashboard.nextUp')}
           </Typography>
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Avatar sx={{ bgcolor: '#fff3e0', width: 40, height: 40 }}>
@@ -123,7 +132,7 @@ const Dashboard: React.FC = () => {
                 {nextBakingStep.description}
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                at {nextBakingStep.time}
+                {(t as any)('dashboard.at')} {nextBakingStep.time}
               </Typography>
             </Box>
           </Stack>
@@ -132,7 +141,7 @@ const Dashboard: React.FC = () => {
         {/* Mini Chart Section */}
         <Paper elevation={1} sx={{ p: 3, borderRadius: 3, height: { xs: 250, md: 300 } }}>
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 'medium' }}>
-            Orders This Week
+            {(t as any)('dashboard.ordersThisWeek')}
           </Typography>
           <ResponsiveContainer width="100%" height="85%">
             <BarChart data={chartData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>

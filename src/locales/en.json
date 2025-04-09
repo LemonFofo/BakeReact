@@ -1,0 +1,11 @@
+{
+  "dashboard": {
+    "welcome": "Welcome back 👋 {{name}}",
+    "ordersToday": "Orders Today",
+    "itemsToBake": "Items to Bake",
+    "dueToday": "Due Today",
+    "nextUp": "Next Up",
+    "ordersThisWeek": "Orders This Week",
+    "at": "at"
+  }
+} 
