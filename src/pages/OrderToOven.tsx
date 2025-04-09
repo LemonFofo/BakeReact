@@ -4,7 +4,60 @@ import BakingPlan from '../components/BakingPlan';
 import AddOrderModal from '../components/AddOrderModal';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import { Order, BakingStep } from '../types';
-import { colors, spacing, typography } from '../theme';
+import { colors, spacing, typography as customTypography, shadows } from '../theme';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeProvider, Box, Typography, Button } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
+
+// --- MUI Theme Integration ---
+const muiTheme = createTheme({
+  palette: {
+    primary: {
+      main: colors.primary,
+      contrastText: colors.white,
+    },
+    secondary: {
+      main: colors.accent,
+      contrastText: colors.white,
+    },
+    error: {
+      main: colors.error,
+    },
+    background: {
+      default: colors.background,
+      paper: colors.white,
+    },
+    text: {
+      primary: colors.text,
+      secondary: colors.textLight,
+    },
+  },
+  spacing: Object.values(spacing), 
+  typography: {
+    h4: { fontSize: customTypography.title.fontSize, fontWeight: customTypography.title.fontWeight },
+    h6: { fontSize: customTypography.subtitle.fontSize, fontWeight: customTypography.subtitle.fontWeight },
+    body1: { fontSize: customTypography.body.fontSize, fontWeight: customTypography.body.fontWeight },
+    caption: { fontSize: customTypography.small.fontSize, fontWeight: customTypography.small.fontWeight }
+  },
+  components: {
+    MuiCard: {
+        styleOverrides: {
+            root: {
+                boxShadow: `0 ${shadows.card.shadowOffset.height}px ${shadows.card.shadowRadius}px ${shadows.card.shadowColor}`,
+                borderRadius: 12,
+            }
+        }
+    },
+    MuiButton: {
+        styleOverrides: {
+            root: {
+                borderRadius: 24,
+                textTransform: 'none',
+            }
+        }
+    }
+  }
+});
 
 // --- Demo Data ---
 const demoOrders: Order[] = [
@@ -66,7 +119,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: spacing.sm,
   },
   title: {
-    ...typography.title,
+    ...customTypography.title,
     color: colors.text,
   },
   emoji: {
@@ -78,7 +131,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: 24,
     border: 'none',
     cursor: 'pointer',
-    ...typography.body,
+    ...customTypography.body,
     color: colors.white,
     fontWeight: 'bold',
   },
@@ -88,7 +141,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: 12,
     textAlign: 'center',
     marginBottom: spacing.xl,
-    ...typography.body,
+    ...customTypography.body,
     color: colors.text,
     fontWeight: '500',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)', // Add a subtle shadow
@@ -100,7 +153,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginBottom: spacing.md,
   },
   sectionTitle: {
-    ...typography.subtitle,
+    ...customTypography.subtitle,
     color: colors.text,
     marginBottom: spacing.xs,
     display: 'block', // Make title a block element
@@ -111,7 +164,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: 40,
   },
   emptyStateText: {
-      ...typography.body,
+      ...customTypography.body,
       color: colors.textLight,
       textAlign: 'center',
       marginTop: spacing.md,
@@ -232,78 +285,102 @@ export default function OrderToOven() {
   console.log('--- Preparing to render JSX ---');
   try {
     return (
-      <div style={styles.container}>
-        {/* Header */}
-        <div style={styles.header}>
-          <div style={styles.titleContainer}>
-            <span style={styles.title}>Order-to-Oven</span> 
-            <span style={styles.emoji}>🧁</span>
+      <ThemeProvider theme={muiTheme}>
+        <Box sx={{ backgroundColor: 'background.default', p: spacing.lg, minHeight: '100vh' }}>
+          {/* Header */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: spacing.xl }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
+              <Typography variant="h4" component="h1" sx={{ color: 'text.primary' }}>
+                Order-to-Oven
+              </Typography>
+              <Typography variant="h4" component="span" role="img" aria-label="cupcake">🧁</Typography>
+            </Box>
+            <Button variant="contained" color="primary" onClick={handleAddOrder} sx={{ fontWeight: 'bold' }}>
+              + Add Order
+            </Button>
+          </Box>
+
+          {/* Date Picker Placeholder */}
+          <Box sx={{ 
+              backgroundColor: 'background.paper', 
+              p: spacing.md, 
+              borderRadius: 3, 
+              textAlign: 'center', 
+              mb: spacing.xl, 
+              boxShadow: 1, 
+              color: 'text.primary',
+              fontWeight: '500'
+          }}>
+            {selectedDate.toLocaleDateString('en-US', {
+              weekday: 'long', month: 'long', day: 'numeric',
+            })}
+          </Box>
+
+          {/* Orders Section */}
+          <Box sx={{ margin: spacing.xl }}>
+            <Box sx={{ mb: spacing.md }}>
+              <Typography variant="h6" component="h2" sx={{ color: 'text.primary', mb: spacing.xs }}>
+                Orders
+              </Typography>
+              <Box sx={{ height: 2, backgroundColor: 'secondary.main', width: 40 }} />
+            </Box>
+            {orders.length === 0 ? (
+              <Typography sx={{ color: 'text.secondary', textAlign: 'center', mt: spacing.md }}>
+                No orders for this date.
+              </Typography>
+            ) : (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: spacing.lg, py: spacing.sm }}> 
+                <AnimatePresence>
+                  {orders.map(order => (
+                    <motion.div
+                      key={order.id}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, x: 100, scale: 0.8 }}
+                      transition={{ duration: 0.3 }}
+                      style={{ marginBottom: spacing.lg }}
+                    >
+                      <OrderCard
+                        order={order}
+                        onEdit={() => handleEditOrder(order.id)}
+                        onDelete={() => handleDeleteOrder(order.id)}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </Box>
+            )}
+          </Box>
+
+          {/* Baking Plan Section */}
+          <div style={styles.section}>
+            <div style={styles.sectionHeader}>
+              <span style={styles.sectionTitle}>Baking Plan</span>
+              <div style={styles.sectionUnderline} />
+            </div>
+            {bakingSteps.length === 0 ? (
+              <p style={styles.emptyStateText}>No baking steps planned.</p>
+            ) : (
+              <BakingPlan steps={bakingSteps} />
+            )}
           </div>
-          <button 
-            style={styles.addButton} 
-            onClick={handleAddOrder}
-          >
-            + Add Order
-          </button>
-        </div>
 
-        {/* Date Picker Placeholder */}
-        <div style={styles.datePicker}>
-          {selectedDate.toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </div>
+          {/* Modals */}
+          <AddOrderModal
+            visible={isAddModalVisible}
+            onClose={handleModalClose}
+            onSubmit={handleModalSubmit}
+            initialData={editingOrder}
+          />
 
-        {/* Orders Section */}
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <span style={styles.sectionTitle}>Orders</span>
-            <div style={styles.sectionUnderline} />
-          </div>
-          {orders.length === 0 ? (
-            <p style={styles.emptyStateText}>No orders for this date.</p>
-          ) : (
-            orders.map(order => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                onEdit={() => handleEditOrder(order.id)}
-                onDelete={() => handleDeleteOrder(order.id)}
-              />
-            ))
-          )}
-        </div>
-
-        {/* Baking Plan Section */}
-        <div style={styles.section}>
-          <div style={styles.sectionHeader}>
-            <span style={styles.sectionTitle}>Baking Plan</span>
-            <div style={styles.sectionUnderline} />
-          </div>
-          {bakingSteps.length === 0 ? (
-            <p style={styles.emptyStateText}>No baking steps planned.</p>
-          ) : (
-            <BakingPlan steps={bakingSteps} />
-          )}
-        </div>
-
-        {/* Modals */}
-        <AddOrderModal
-          visible={isAddModalVisible}
-          onClose={handleModalClose}
-          onSubmit={handleModalSubmit}
-          initialData={editingOrder}
-        />
-
-        <DeleteConfirmationModal
-          visible={isDeleteModalVisible}
-          onClose={handleDeleteCancel}
-          onConfirm={handleDeleteConfirm}
-          orderName={orderToDelete?.clientName || orderToDelete?.item || 'this order'}
-        />
-      </div>
+          <DeleteConfirmationModal
+            visible={isDeleteModalVisible}
+            onClose={handleDeleteCancel}
+            onConfirm={handleDeleteConfirm}
+            orderName={orderToDelete?.clientName || orderToDelete?.item || 'this order'}
+          />
+        </Box>
+      </ThemeProvider>
     );
   } catch (error) {
       console.error("Error rendering OrderToOven component:", error);

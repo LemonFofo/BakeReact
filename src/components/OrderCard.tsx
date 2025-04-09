@@ -1,6 +1,19 @@
 import React from 'react';
+// MUI Imports
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Box from '@mui/material/Box';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import { Order } from '../types';
-import { colors, spacing, typography, shadows } from '../theme';
+import { spacing } from '../theme';
+
+// Framer Motion
+import { motion } from 'framer-motion';
 
 interface OrderCardProps {
   order: Order;
@@ -8,228 +21,95 @@ interface OrderCardProps {
   onEdit?: () => void;
 }
 
-// Define styles with correct types for React
-const styles: { [key: string]: React.CSSProperties } = {
-  card: {
-    backgroundColor: colors.white,
-    borderRadius: 12,
-    padding: spacing.md,
-    margin: `${spacing.sm}px 0`,
-    boxShadow: `0 ${shadows.card.shadowOffset.height}px ${shadows.card.shadowRadius}px ${shadows.card.shadowColor}`,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
+// Framer Motion variants for animation
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 }, // Initial state (can be used for entry animation too)
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3 }
   },
-  pressed: { // Note: Pressable-like state needs different handling in web
-    transform: 'scale(0.98)',
-    opacity: 0.9,
-  },
-  content: {
-    flex: 1,
-  },
-  header: {
-    marginBottom: spacing.xs,
-  },
-  title: {
-    ...typography.body,
-    fontWeight: 'bold',
-    color: colors.text,
-    display: 'block', // Ensure title takes space
-  },
-  clientName: {
-    ...typography.small,
-    color: colors.textLight,
-    display: 'block', // Ensure client name takes space
-  },
-  details: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  quantity: {
-    ...typography.small,
-    color: colors.primary,
-    fontWeight: 'bold',
-  },
-  deliveryInfo: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: spacing.xs,
-  },
-  deliveryType: {
-    ...typography.small,
-    color: colors.textLight,
-    textTransform: 'capitalize',
-  },
-  time: {
-    ...typography.small,
-    color: colors.textLight,
-  },
-  actions: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: spacing.xs,
-  },
-  button: {
-    padding: spacing.xs,
-    borderRadius: 8,
-    width: 36,
-    height: 36,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    border: 'none', // Remove default button border
-    cursor: 'pointer', // Add cursor pointer
-  },
-  editButton: {
-    backgroundColor: colors.accent,
-  },
-  deleteButton: {
-    backgroundColor: colors.primary,
-  },
-  buttonText: {
-    fontSize: 16,
-    color: colors.white, // Assuming white text for buttons
-  },
+  exit: {
+    opacity: 0,
+    x: 100, // Slide right
+    transition: { duration: 0.3 }
+  }
 };
 
 export default function OrderCard({ order, onDelete, onEdit }: OrderCardProps) {
-  console.log('OrderCard rendered for order:', order);
+  console.log('OrderCard rendered for order:', order.id);
 
-  const time = new Date(order.deliveryTime).toLocaleTimeString([], { 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  const time = new Date(order.deliveryTime).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
   });
 
   return (
-    // Apply styles using the style prop
-    <div style={styles.card}>
-      <div style={styles.content}>
-        <div style={styles.header}>
-          <span style={styles.title}>
+    <motion.div 
+      key={order.id} // Key remains on the motion component
+      variants={cardVariants}
+      initial="visible"
+      animate="visible"
+      exit="exit"
+    >
+      <Card sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', mb: spacing.md }}>
+        <CardContent sx={{ flexGrow: 1, pb: { xs: 0, sm: 2 } }}>
+          <Typography variant="body1" component="p" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
             {order.item}
-          </span>
-          <span style={styles.clientName}>
+          </Typography>
+          <Typography variant="caption" component="p" sx={{ color: 'text.secondary', mb: 1 }}>
             for {order.clientName}
-          </span>
-        </div>
-        <div style={styles.details}>
-          <span style={styles.quantity}>
-            {order.quantity}x
-          </span>
-          <div style={styles.deliveryInfo}>
-            <span style={styles.deliveryType}>
-              {order.deliveryType}
-            </span>
-            <span style={styles.time}>
-              @ {time}
-            </span>
-          </div>
-        </div>
-      </div>
-      <div style={styles.actions}>
-        {onEdit && (
-          <button 
-            onClick={() => {
-              console.log('Edit button clicked for order:', order.id);
-              onEdit();
-            }} 
-            // Combine button and editButton styles
-            style={{...styles.button, ...styles.editButton}}
-          >
-            <span style={styles.buttonText}>✏️</span>
-          </button>
-        )}
-        {onDelete && (
-          <button 
-            onClick={() => {
-              console.log('Delete button clicked for order:', order.id);
-              onDelete();
-            }} 
-            // Combine button and deleteButton styles
-            style={{...styles.button, ...styles.deleteButton}}
-          >
-            <span style={styles.buttonText}>🗑️</span>
-          </button>
-        )}
-      </div>
-    </div>
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: spacing.sm }}>
+            <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+              {order.quantity}x
+            </Typography>
+            <Box sx={{ display: 'flex', gap: spacing.xs }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
+                {order.deliveryType}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                @ {time}
+              </Typography>
+            </Box>
+          </Box>
+        </CardContent>
+        <CardActions sx={{ 
+            flexShrink: 0, 
+            alignSelf: { xs: 'flex-end', sm: 'center' },
+            p: { xs: 1, sm: 2 },
+            pt: { xs: 0, sm: 2 }
+        }}>
+          {onEdit && (
+            <IconButton 
+              size="small" 
+              onClick={() => {
+                console.log('Edit button clicked for order:', order.id);
+                onEdit && onEdit();
+              }}
+              aria-label="edit"
+              sx={{ backgroundColor: 'secondary.main', color: 'secondary.contrastText', '&:hover': { backgroundColor: 'secondary.dark' } }}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+          )}
+          {onDelete && (
+            <IconButton 
+              size="small" 
+              onClick={() => {
+                console.log('Delete button clicked for order:', order.id);
+                onDelete && onDelete();
+              }}
+              aria-label="delete"
+              sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText', '&:hover': { backgroundColor: 'primary.dark' } }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          )}
+        </CardActions>
+      </Card>
+    </motion.div>
   );
 }
 
-// Remove StyleSheet and convert styles to CSS
-// const styles = StyleSheet.create({
-//   card: {
-//     backgroundColor: colors.white,
-//     borderRadius: 12,
-//     padding: spacing.md,
-//     marginVertical: spacing.sm,
-//     ...shadows.card,
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//   },
-//   pressed: {
-//     transform: [{ scale: 0.98 }],
-//     opacity: 0.9,
-//   },
-//   content: {
-//     flex: 1,
-//   },
-//   header: {
-//     marginBottom: spacing.xs,
-//   },
-//   title: {
-//     ...typography.body,
-//     fontWeight: 'bold',
-//     color: colors.text,
-//   },
-//   clientName: {
-//     ...typography.small,
-//     color: colors.textLight,
-//   },
-//   details: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     gap: spacing.sm,
-//   },
-//   quantity: {
-//     ...typography.small,
-//     color: colors.primary,
-//     fontWeight: 'bold',
-//   },
-//   deliveryInfo: {
-//     flexDirection: 'row',
-//     gap: spacing.xs,
-//   },
-//   deliveryType: {
-//     ...typography.small,
-//     color: colors.textLight,
-//     textTransform: 'capitalize',
-//   },
-//   time: {
-//     ...typography.small,
-//     color: colors.textLight,
-//   },
-//   actions: {
-//     flexDirection: 'row',
-//     gap: spacing.xs,
-//   },
-//   button: {
-//     padding: spacing.xs,
-//     borderRadius: 8,
-//     width: 36,
-//     height: 36,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-//   editButton: {
-//     backgroundColor: colors.accent,
-//   },
-//   deleteButton: {
-//     backgroundColor: colors.primary,
-//   },
-//   buttonText: {
-//     fontSize: 16,
-//   },
-// }); 
+// Old styles object is removed 
