@@ -6,6 +6,7 @@ import { ThemeProvider } from '@mui/material/styles'; // Re-import if needed for
 
 import Sidebar from './components/Sidebar';
 import OrderToOven from './pages/OrderToOven'; // Assuming this is one of your main pages
+import Dashboard from './pages/Dashboard';
 // Import other page components as needed
 // import Dashboard from './pages/Dashboard'; 
 
@@ -40,6 +41,7 @@ function App() {
           {/* <Toolbar /> */}
           <Routes>
             {/* Define routes for your pages */}
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/orders" element={<OrderToOven />} />
             {/* Add other routes here */}
             {/* Example:
@@ -49,10 +51,13 @@ function App() {
             ... etc
             */}
 
-            {/* Redirect base path or non-matched paths to a default page */}
-            <Route path="/" element={<Navigate to="/orders" replace />} /> 
+            {/* Redirect base path to dashboard */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} /> 
             {/* Optionally add a 404 Not Found route */} 
             {/* <Route path="*" element={<NotFound />} /> */} 
+
+            {/* Catch-all route */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </Box>
       </Box>
