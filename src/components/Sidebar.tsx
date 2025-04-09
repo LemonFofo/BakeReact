@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
@@ -9,6 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
+import PersonIcon from '@mui/icons-material/Person';
 
 // Import Icons
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -21,7 +23,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 
-const drawerWidth = 260;
+const drawerWidth = 240;
 
 const navItems = [
   { label: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
@@ -34,139 +36,153 @@ const navItems = [
 ];
 
 const bottomNavItems = [
-    { label: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-    { label: 'Sign Out', icon: <LogoutIcon />, path: '/logout' }, // Adjust path as needed
+  { label: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+  { label: 'Sign Out', icon: <LogoutIcon />, path: '/logout' },
 ];
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const theme = useTheme();
 
   const handleNavigation = (path: string) => {
     navigate(path);
   };
 
-  // Placeholder function for logout if needed
   const handleLogout = () => {
     console.log("Logout triggered");
-    // Add actual logout logic here
-    navigate('/login'); // Example redirect after logout
+    navigate('/login');
   }
 
   return (
     <Drawer
-      variant="permanent"
       sx={{
         width: drawerWidth,
         flexShrink: 0,
-        [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundColor: '#FAF8F6', // Light background
-            borderRight: 'none', // Remove default border
-            boxShadow: 'rgba(0, 0, 0, 0.05) 0px 1px 2px 0px', // Soft shadow
-            fontFamily: 'Inter, sans-serif',
+        '& .MuiDrawer-paper': {
+          width: drawerWidth,
+          boxSizing: 'border-box',
+          borderRight: `1px solid ${theme.palette.divider}`,
+          backgroundColor: theme.palette.background.paper,
         },
       }}
+      variant="permanent"
+      anchor="left"
     >
-      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', my: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          py: 3,
+          backgroundColor: theme.palette.primary.main,
+        }}
+      >
         <Avatar
-          alt="Baker Avatar" 
-          src="/placeholder-avatar.png" // Replace with actual path or remove src for default icon
-          sx={{ width: 80, height: 80, mb: 1.5, boxShadow: 3 }} 
-        />
-        <Typography variant="h6" sx={{ fontWeight: 'medium', color: 'text.primary' }}>
-          Fer's Bakery
-        </Typography>
-        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-          Administrator
+          sx={{
+            width: 64,
+            height: 64,
+            mb: 1,
+            bgcolor: theme.palette.background.paper,
+            color: theme.palette.primary.main,
+          }}
+        >
+          <PersonIcon />
+        </Avatar>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            fontWeight: 500,
+            color: theme.palette.primary.contrastText,
+          }}
+        >
+          Bakery Admin
         </Typography>
       </Box>
 
-      <Divider sx={{ mx: 2 }} />
+      <Divider />
 
-      <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-        <List sx={{ pt: 2 }}>
-          {navItems.map((item) => {
-            const isSelected = location.pathname.startsWith(item.path);
-            return (
-              <ListItemButton
-                key={item.label}
-                selected={isSelected}
-                onClick={() => handleNavigation(item.path)}
-                sx={{
-                  mx: 2, // Horizontal margin
-                  mb: 0.5, // Margin bottom between items
-                  borderRadius: 1.5,
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(255, 107, 107, 0.1)', // Use primary color with opacity
-                    '&:hover': {
-                        backgroundColor: 'rgba(255, 107, 107, 0.15)',
-                    },
-                    '& .MuiListItemIcon-root': {
-                        color: 'primary.main',
-                    },
-                    '& .MuiListItemText-primary': {
-                        fontWeight: 'medium', // Make selected text bold
-                        color: 'primary.main',
-                    },
-                  },
-                  '& .MuiListItemIcon-root': {
-                    minWidth: 40, // Adjust icon spacing
-                    color: 'text.secondary', // Default icon color
-                  },
-                }}
-              >
-                <ListItemIcon>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.label} />
-              </ListItemButton>
-            );
-          })}
-        </List>
-      </Box>
+      <List sx={{ flexGrow: 1, pt: 2, px: 1 }}>
+        {navItems.map((item) => (
+          <ListItemButton
+            key={item.label}
+            onClick={() => handleNavigation(item.path)}
+            selected={location.pathname === item.path}
+            sx={{
+              borderRadius: 1,
+              mb: 0.5,
+              color: theme.palette.text.primary,
+              '&.Mui-selected': {
+                backgroundColor: theme.palette.primary.light,
+                color: theme.palette.primary.main,
+                '&:hover': {
+                  backgroundColor: theme.palette.primary.light,
+                },
+                '& .MuiListItemIcon-root': {
+                  color: theme.palette.primary.main,
+                },
+              },
+              '&:hover': {
+                backgroundColor: theme.palette.action.hover,
+              },
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                color: location.pathname === item.path
+                  ? theme.palette.primary.main
+                  : theme.palette.text.secondary,
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.label} />
+          </ListItemButton>
+        ))}
+      </List>
 
-      <Divider sx={{ mx: 2 }} />
+      <Divider />
 
-      {/* Bottom Navigation Items (Settings, Logout) */}
       <List sx={{ py: 1 }}>
         {bottomNavItems.map((item) => {
-            const isSelected = location.pathname.startsWith(item.path);
-            return (
-              <ListItemButton
-                key={item.label}
-                selected={isSelected}
-                onClick={item.path === '/logout' ? handleLogout : () => handleNavigation(item.path)}
+          const isSelected = location.pathname === item.path;
+          return (
+            <ListItemButton
+              key={item.label}
+              selected={isSelected}
+              onClick={item.path === '/logout' ? handleLogout : () => handleNavigation(item.path)}
+              sx={{
+                mx: 2,
+                mb: 0.5,
+                borderRadius: 1.5,
+                color: theme.palette.text.primary,
+                '&.Mui-selected': {
+                  backgroundColor: theme.palette.primary.light,
+                  color: theme.palette.primary.main,
+                  '&:hover': {
+                    backgroundColor: theme.palette.primary.light,
+                  },
+                },
+                '&:hover': {
+                  backgroundColor: theme.palette.action.hover,
+                },
+                '& .MuiListItemIcon-root': {
+                  minWidth: 40,
+                  color: theme.palette.text.secondary,
+                },
+              }}
+            >
+              <ListItemIcon
                 sx={{
-                  mx: 2,
-                  mb: 0.5,
-                  borderRadius: 1.5,
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(0, 0, 0, 0.04)', 
-                    '&:hover': {
-                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                    },
-                    '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-                        color: item.label === 'Sign Out' ? 'error.main' : 'text.primary',
-                    },
-                  },
-                  '& .MuiListItemIcon-root': {
-                    minWidth: 40,
-                    color: item.label === 'Sign Out' ? 'error.main' : 'text.secondary',
-                  },
-                   '& .MuiListItemText-primary': {
-                        color: item.label === 'Sign Out' ? 'error.main' : 'inherit',
-                    },
+                  color: isSelected ? theme.palette.primary.main : theme.palette.text.secondary,
                 }}
               >
-                <ListItemIcon>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.label} />
-              </ListItemButton>
-            );
-          })}
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          );
+        })}
       </List>
     </Drawer>
   );
