@@ -11,6 +11,7 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import PersonIcon from '@mui/icons-material/Person';
+import { supabase } from '../lib/supabaseClient';
 
 // Import Icons
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -45,14 +46,24 @@ const Sidebar: React.FC = () => {
   const location = useLocation();
   const theme = useTheme();
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
+  const handleNavigation = async (path: string) => {
+    if (path === '/logout') {
+      try {
+        console.log('🔒 Signing out...');
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          console.error('❌ Sign out error:', error.message);
+          throw error;
+        }
+        console.log('✅ Successfully signed out');
+        navigate('/signin', { replace: true });
+      } catch (err) {
+        console.error('❌ Error during sign out:', err);
+      }
+    } else {
+      navigate(path);
+    }
   };
-
-  const handleLogout = () => {
-    console.log("Logout triggered");
-    navigate('/login');
-  }
 
   return (
     <Drawer
@@ -150,7 +161,7 @@ const Sidebar: React.FC = () => {
             <ListItemButton
               key={item.label}
               selected={isSelected}
-              onClick={item.path === '/logout' ? handleLogout : () => handleNavigation(item.path)}
+              onClick={item.path === '/logout' ? () => handleNavigation('/logout') : () => handleNavigation(item.path)}
               sx={{
                 mx: 2,
                 mb: 0.5,

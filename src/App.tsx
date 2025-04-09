@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline'; // Ensures consistent baseline styles
 import { ThemeProvider } from '@mui/material/styles'; // Re-import if needed for global theme
-
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { SignIn } from './pages/SignIn';
+import { SignUp } from './pages/SignUp';
+import Dashboard from './pages/Dashboard';
 import Sidebar from './components/Sidebar';
 import OrderToOven from './pages/OrderToOven'; // Assuming this is one of your main pages
-import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
 import { createCustomTheme, type CustomPalette } from './theme/theme';
+import { supabase } from './lib/supabaseClient';
 // Import other page components as needed
 // import Dashboard from './pages/Dashboard'; 
 
@@ -27,6 +31,20 @@ function App() {
     return createCustomTheme({ primary: '#FF6B81', accent: '#FFC3D1' });
   });
 
+  // Listen for auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        console.log('👋 User signed out, cleaning up...');
+        // You can add any cleanup here if needed
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const handleThemeChange = (palette: CustomPalette) => {
     const newTheme = createCustomTheme(palette);
     setTheme(newTheme);
@@ -35,45 +53,51 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Router>
-        <Box sx={{ display: 'flex' }}>
-          <CssBaseline /> {/* Apply baseline styles */} 
-          <Sidebar />
-          <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              p: 3, // Add padding to the main content area
-              width: `calc(100% - ${drawerWidth}px)`,
-              minHeight: '100vh', // Ensure content area takes full height
-            }}
-          >
-            {/* Add Toolbar spacer if using AppBar later, otherwise adjust top padding */}
-            {/* <Toolbar /> */}
-            <Routes>
-              {/* Define routes for your pages */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/orders" element={<OrderToOven />} />
-              <Route path="/settings" element={<Settings onThemeChange={handleThemeChange} />} />
-              {/* Add other routes here */}
-              {/* Example:
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/schedule" element={<BakeSchedule />} /> 
-              <Route path="/calendar" element={<CalendarPage />} />
-              ... etc
-              */}
+      <AuthProvider>
+        <Router>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
 
-              {/* Redirect base path to dashboard */}
-              <Route path="/" element={<Navigate to="/dashboard" replace />} /> 
-              {/* Optionally add a 404 Not Found route */} 
-              {/* <Route path="*" element={<NotFound />} /> */} 
-
-              {/* Catch-all route */}
+            {/* Protected layout wrapper */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Box sx={{ display: 'flex' }}>
+                    <CssBaseline /> {/* Apply baseline styles */} 
+                    <Sidebar />
+                    <Box
+                      component="main"
+                      sx={{
+                        flexGrow: 1,
+                        p: 3,
+                        width: '100%',
+                        marginLeft: { xs: 0, md: `${drawerWidth}px` },
+                        transition: 'margin 0.2s ease-out',
+                      }}
+                    >
+                      <Outlet />
+                    </Box>
+                  </Box>
+                </ProtectedRoute>
+              }
+            >
+              {/* Nested protected routes */}
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="OrderToBake" element={<Dashboard />} />
+              <Route path="orders" element={<OrderToOven />} />
+              <Route path="settings" element={<Settings onThemeChange={handleThemeChange} />} />
+              <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Routes>
-          </Box>
-        </Box>
-      </Router>
+            </Route>
+
+            {/* Catch all route - redirect to signin */}
+            <Route path="*" element={<Navigate to="/signin" replace />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
